@@ -39,11 +39,13 @@ qualquer espaço público onde alguém represente o mesmo ou a sua
 comunidade.
 
 Comportamento abusivo, de assédio ou de outros tipos pode ser
-comunicados contatando o administrador do projeto [INSIRA O ENDEREÇO
-DE EMAIL]. Todas as queixas serão revistas e investigadas e
+comunicados contatando o tradutor do projeto para a lingua portuguêsa
+[Carlos Delfino](consultoria@carlosdelfino.eti.br). 
+Todas as queixas serão revistas e investigadas e
 resultarão numa resposta necessária e apropriada à situação.
 Os administradores são obrigados a manter a confidencialidade em relação
 ao elemento que reportou o incidente.
 
 Este Código de Conduta é adaptado do [Contributor Covenant](http://contributor-covenant.org),
 versão 1.3.0, disponível em [http://contributor-covenant.org/version/1/3/0/pt_br/](http://contributor-covenant.org/version/1/3/0/pt_br/)
+
