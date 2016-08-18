@@ -1,7 +1,7 @@
 ---
 layout: old-wiki-page
 lang: en
-permalink: /micro-os-plus/ii/The_µOS++_Second_Edition_Wiki/
+permalink: /micro-os-plus/ii/The_uOS++_Second_Edition_Wiki/
 title: The µOS++ Second Edition Wiki
 author: Liviu Ionescu
 
@@ -9,7 +9,7 @@ date: 2015-09-28 11:07:03 +0000
 
 ---
 
-The ***µOS++ SE*** (micro oh ɛs plus plus second edition) project is the second iteration of ***µOS++***, a [SourceForge hosted](http://sourceforge.net/projects/micro-os-plus/) open source, royalty-free, multi-tasking operating system intended for 16/32/64 bit embedded systems. It will be based on a simple preemptive scheduler specifically designed for ARM Cortex-M devices and also ported on AVR8 devices. It is written in a subset of C++11 and compiles with modern GNU GCC and LLVM Clang compilers. It uses templates for compile time polymorphism and inlines as much as possible, which leads to highly optimised code.
+The ***µOS++ SE*** (micro oh É›s plus plus second edition) project is the second iteration of ***µOS++***, a [SourceForge hosted](http://sourceforge.net/projects/micro-os-plus/) open source, royalty-free, multi-tasking operating system intended for 16/32/64 bit embedded systems. It will be based on a simple preemptive scheduler specifically designed for ARM Cortex-M devices and also ported on AVR8 devices. It is written in a subset of C++11 and compiles with modern GNU GCC and LLVM Clang compilers. It uses templates for compile time polymorphism and inlines as much as possible, which leads to highly optimised code.
 
 The authoritative µOS++ reference documents can be found in the project [documentation pages](http://micro-os-plus.sourceforge.net/doc), with additional documents in this Wiki. The source code itself, publicly available for browsing via the web [Git Browse](http://sourceforge.net/p/micro-os-plus/second/) interface is another good source of information. (Additional resources can be found in the SourceForge trackers mentioned in the [Support]({{ site.baseurl }}/micro-os-plus/ii/Support "wikilink") page). The configuration metadata is documented in the [XCDL wiki](http://xcdl.sourceforge.net/wiki/).
 

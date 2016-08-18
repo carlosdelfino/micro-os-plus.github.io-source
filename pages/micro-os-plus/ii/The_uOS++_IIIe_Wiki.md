@@ -1,7 +1,7 @@
 ---
 layout: old-wiki-page
 lang: en
-permalink: /micro-os-plus/ii/The_µOS++_IIIe_Wiki/
+permalink: /micro-os-plus/ii/The_uOS++_IIIe_Wiki/
 title: The µOS++ IIIe Wiki
 author: Liviu Ionescu
 
@@ -14,7 +14,7 @@ The ***µOS++ IIIe*** (micro oh ɛs plus plus third edition) project (affectiona
 **Note:** This new version is currently an early concept, with major design choices to be taken; for those interested in a functional version, please read:
 
 -   [the µOS++ wiki](http://micro-os-plus.sourceforge.net/old-wiki/) (first edition)
--   [the µOS++ Second Edition wiki](http://micro-os-plus.sourceforge.net/wiki/The_µOS%2B%2B_Second_Edition_Wiki) and [Doxygen](http://micro-os-plus.sourceforge.net/doc/).
+-   [the µOS++ Second Edition wiki](http://micro-os-plus.sourceforge.net/wiki/The_uOS%2B%2B_Second_Edition_Wiki) and [Doxygen](http://micro-os-plus.sourceforge.net/doc/).
 
 Introduction
 ------------
