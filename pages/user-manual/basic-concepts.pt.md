@@ -7,7 +7,7 @@ author: Liviu Ionescu
 translator: Carlos Delfino
 
 date: 2016-06-30 14:39:00 +0300
-last_modified_at: 2016-11-09 14:30:00 +300
+last_modified_at: 2016-11-08 14:30:00 +300
 ---
 {% comment %}
 Start translate at: 2016-08-15 19:30:00 +300
@@ -61,12 +61,9 @@ Um sistema embarcado [real-time](https://en.wikipedia.org/wiki/Real-time_computi
 tempo de um dispositivo embarcado, normalmente construído em torno de um 
 microcontrolador, enfatizando os valores calculados e a disponibilidade de tempo 
 esperado por processo.
-{% comment %} 
-added "por processos" for contextualize the "expected time" 
-{% endcomment %}
+{% comment %} added "por processos" for contextualize the "expected time" {% endcomment %}
 
-µOS++ é um sistema operacional de tempo real (do inglês Real-Time Operating 
-System - RTOS).
+µOS++ é um sistema operacional de tempo real (do inglês Real-Time Operating System - RTOS).
 
 ## Sistemas real-time, Soft vs Hard
 
@@ -493,351 +490,213 @@ _threads_ sendo inseridas no final da fila, e o escalonador extraindo do inicio
 da fila. Este mecanismo funciona bem se não necessidade de garantir tempo de 
 resposta.
 
-Quando o tempo de resposta se torna importante, o mecanismo pode ser melhorado 
-substancialmente adicionando prioridades para as _threads_, e ordenando a lista 
-de _threads_ prontas pela prioridade.
+Quando o tempo de resposta se torna importante, o mecanismo pode ser melhorado substancialmente adicionando prioridades para as _threads_, e ordenando a lista de _threads_ prontas pela prioridade.
 
-Desta forma inserindo _threads_ de alta prioridades imediatamente na frente das 
-_threads_ de baixa prioridades, dois objetivos são atingidos ao mesmo tempo:
+Desta forma inserindo _threads_ de alta prioridades imediatamente na frente das _threads_ de baixa prioridades, dois objetivos são atingidos ao mesmo tempo:
 
- - A _thread_ de maior prioridade está sempre na frente da lista, assim o 
-   escalonador sempre dará o controle para as _threads_ de alta prioridade;
- - _Threads_ com prioridades iguais não apenas são mantidas juntas, mas também 
-   manterão a ordem de inserção.
+- a _thread_ de maior prioridade está sempre na frente da lista, assim o escalonador sempre dará o controle para as _threads_ de alta prioridade;
+- _threads_ com prioridades iguais não apenas são mantidas juntas, mas também manterão a ordem de inserção.
 
-Por padrão, as _threads_ de usuário no µOS++  são criadas com prioridade _normal_. 
-Como resultado o comportamento padrão do escalonador é _[round-robin](https://pt.wikipedia.org/wiki/Round-robin)_.
+{% comment %}
+define: round-robin -> https://pt.wikipedia.org/wiki/Round-robin
+{% endcomment %}
+Por padrão, as _threads_ de usuário no µOS++  são criadas com prioridade _normal_. Como resultado o comportamento padrão do escalonador é _round-robin_.
 
-Assim que a prioridades são alteradas, o comportamento do escalonador muda 
-automaticamente alterando o escalonamento das prioridades, voltando a usar 
-_round-robin_ para _threads_ com prioridades iguais.
+Assim que a prioridades são alteradas, o comportamento do escalonador muda automaticamente alterando o escalonamento das prioridades, voltando a usar _round-robin_ para _threads_ com prioridades iguais.
 
 ### Selecionando a prioridade das _threads_
 
-Como regra geral, _threads_ que sejam implementadas por funções _hard real-time_ 
-devem ser designadas com prioridade superior as que implementam por funções 
-_soft real-time_. Porem, outras caracteristicas, tais como tempo de execução e 
-utilização do processador, devem também ser considerados para assegurar que a 
-aplicação como um todo nunca perca um prazo _hard real-time_.
+Como regra geral, _threads_ que sejam implemente funções _hard real-time_ devem ser designadas com prioridade superior as que implementam funções _soft real-time_. Porem, outras caracteristicas, tais como tempo de execução e utilização do processador, devem também ser considerados para assegurar que a aplicação como um todo nunca perca um prazo _hard real-time_.
 
-Uma técnica possível é designar prioridades únicas, de acordo com a taxa de 
-execução periódica (uma prioridade maior é designada para a _thread_ que tem o 
-período de execução com maior frequência). Esta técnica  é chamada de 
-_Rate Monotonic Scheduling_ (RMS).
+Uma técnica possível para é designar prioridades únicas, de acordo com a taxa de execução periódica (uma prioridade maior é designada para a _thread_ que tem o período de execução com maior frequência). Esta técnica  é chamada de _Rate Monotonic Scheduling_ (RMS).
 
 ### Inversão de Prioridade / Herança de Prioridade
 
-Inversão de prioridade é um cenário problemático no escalonador em que uma 
-_thread_ de alta prioridade é indiretamente impedida de executar por uma _thread_ 
-de baixa prioridade, efetivamente "invertendo" a prioridade relativa das duas 
-_threads_.
+Inversão de prioridade é um cenário problemático no escalonador em que uma _thread_ de alta prioridade é indiretamente impedida de executar por uma _thread_ de baixa prioridade efetivamente "invertendo" a prioridade relativa das duas _threads_.
 
 O primeiro cenário é o seguinte:
 
- - Uma _thread_ de baixa prioridade adquire um recurso comum;
- - Em seguida uma ISR, uma _thread_ de alta prioridade se torna ativa, e tenta 
-   adquirir o mesmo recurso, mas o encontra ocupado e é bloqueada, aguardando 
-   o recurso a ser liberado;
- - A _thread_ de baixa prioridade é retomada, completa seu trabalho e libera o 
-   recurso;
- - A _thread_ de alta prioridade é retomada e pode adquirir o recurso para executar 
-   seu trabalho;
+- Uma _thread_ de baixa prioridade adquire um recurso comum;
+- Em seguida uma ISR, uma _thread_ de alta prioridade se torna ativa, e tenta adquirir o mesmo recurso, mas o encontra ocupado e é bloqueada, aguardando o recurso a ser liberado;
+- A _thread_ de baixa prioridade é retomada, completa seu trabalho e libera o recurso;
+- A _thread_ de alta prioridade é retomada e pode adquirir o recurso para executar seu trabalho;
 
-Apesar que para a _thread_ de alta prioridade este é um cenário lamentável, não 
-há muito o que se possa fazer além de aguardar pela _thread_ de baixa prioridade 
-liberar o recurso.
+Apesar que para a _thread_ de alta prioridade este é um cenário lamentável, não há muito o que se possa fazer mas aguardar pela _thread_ de baixa prioridade liberar o recurso.
 
 Um cenário ainda mais lamentável é o seguinte:
 
- - Uma _thread_ de baixa prioridade adquire um recurso;
- - Em seguida uma ISR, uma _thread_ de alta prioridade se torna ativa, e tenta 
-   adquirir o mesmo recurso, mas ela o encontra ocupado e é bloqueada, aguardando 
-   pelo recurso a ser liberado;
- - Durante este tempo, uma _thread_ de prioridade média se torna pronta;
- - Assim que a _thread_ de alta prioridade é suspensa, a _thread_ de prioridade 
-   média é retomada;
- - Esta evita que a _thread_ de baixa prioridade execute e libere o recurso, o 
-   que evita que a _thread_ de alta prioridade execute;
- - Em certo momento, a _thread_ de prioridade média é suspendida;
- - A _thread_ de baixa prioridade é resumida, completa seu trabalho e libera o 
-   recurso;
- - a _thread_ de atla prioridade é retomada e pode adquirir o recurso para 
-   executar seu trabalho;
+- Uma _thread_ de baixa prioridade adquire um recurso;
+- Em seguida uma ISR, uma _thread_ de alta prioridade se torna ativa, e tenta adquirir o mesmo recurso, mas ela o encontra ocupado e é bloqueada, aguardando pelo recurso a ser liberado;
+- Durante este tempo, uma _thread_ de prioridade média se torna pronta;
+- Assim que a _thread_ de alta prioridade é suspensa, a _thread_ de prioridade média é retomada;
+- Esta evita que a _thread_ de baixa prioridade execute e libere o recurso, o que evita que a _thread_ de alta prioridade execute;
+- Em certo momento, a _thread_ de prioridade média é suspendida;
+- A _thread_ de baixa prioridade é resumida, completa seu trabalho e libera o recurso;
+- a _thread_ de atla prioridade é retomada e pode adquirir o recurso para executar seu trabalho;
 
 <div style="text-align:center">
 <img src="{{ site.baseurl }}/assets/images/2016/priority-inversion.png" />
 <p>Priority inversion</p>
 </div>
 
-O problema neste cenário é que apesar da _thread_ de alta prioridade anunciar 
-sua intenção de adquirir o recurso e saber que deve aguadar pela _thread_ de 
-baixa prioridade libera-lo, uma _thread_ de prioridade média ainda pode evitar 
-que isso aconteça, comportando-se como se tivesse uma prioridade alta. Isto é 
-conhecido como **inversão de prioridade ilimitada** (unbounded priority inversion). 
-Ela é ilimitada porque alguma prioridade média pode extender o tempo que _thread_ 
-de alta prioridade tenha que esperar pelos recursos.
+O problema neste cenário é que apesar da _thread_ de alta prioridade anunciar sua intenção de adquirir o recurso e saber que deve agudar pela _thread_ de baixa prioridade libera-lo, uma _thread_ de prioridade média ainda pode evitar que isso aconteça, comportando-se como se tivesse uma prioridade alta. Isto é conhecido como **inversão de prioridade ilimitada** (unbounded priority inversion). Ela é ilimitada porque alguma prioridade média pode extender o tempo que _thread_ de alta prioridade tenha que esperar pelos recursos.
 
-Este problema foi conhecido por certo tempo, mas muitas vezes ignorado, até ele 
-ter sido reportado com efeito sobre a espaçonava 
-[NASA JPL’s Mars Pathfinder](https://en.wikipedia.org/wiki/Mars_Pathfinder), 
-(veja em [What really happened on Mars?](http://research.microsoft.com/en-us/um/people/mbj/Mars_Pathfinder/)).
+Este problema foi conhecido por certo tempo, mas muitas vezes ignorado, até ele ter sido reportado com efeito sobre a espaçonava [NASA JPL’s Mars Pathfinder](https://en.wikipedia.org/wiki/Mars_Pathfinder), (veja em [What really happened on Mars?](http://research.microsoft.com/en-us/um/people/mbj/Mars_Pathfinder/)).
 
-Uma das possíveis soluções para evitar isso é a _thread_ de alta prioridade 
-temporariamente elevar a prioridade da _thread_ de baixa prioridade, para evitar 
-que outras _threads_ interfira e assim ajudar a _thread_ de baixa prioridade 
-completar seu trabalho mais cedo. Isso é conhecido como **herança de prioridade** 
-(priority inheritance).
+Uma das possíveis soluções para evitar isso é a _thread_ de alta prioridade temporariamente elevar a prioridade da _thread_ de baixa prioridade, para evitar que outras _threads_ interfira e assim ajudar a _thread_ de baixa prioridade completar seu trabalho mais cedo. Isso é conhecido como **herança de prioridade** (priority inheritance).
 
 <div style="text-align:center">
 <img src="{{ site.baseurl }}/assets/images/2016/priority-inheritance.png" />
 <p>Priority inheritance</p>
 </div>
 
-Deve ser observado que este herança de prioridade não resolve o problema de 
-inversão de prioridade completamente, a _thread_ de alta prioridade continua 
-tendo que esperar a _thread_ de baixa prioridade liberar o recurso, mas pelo 
-menos ela faz o melhor para evitar que outras _threads_ de meia prioridade 
-interferir. Não é uma boa prática depender somente herança de prioridade para 
-corrigir a operação do sistema e o problema deve ser evitado em tempo de 
-desenvolvimento do sistema, através da consideração de como os recursos serão 
-acessados.
+Deve ser observado que este herança de prioridade não resolve o problema de inversão de prioridade completamente, a _thread_ de alta prioridade continua tendo que esperar a _thread_ de baixa prioridade liberar o recurso, mas pelo menos ela faz o melhor para evitar que outras _threads_ de meia prioridade interferir. Não é uma boa prática depender somente erança de prioridade para corrigir a operação do sistema e o problema deve ser evitado em tempo de desenvolvimento do sistema, através da consideração de como os recursos serão acessados.
 
 
 ## Comunicação entre _threads_ e/ou ISRs
 
-Em uma aplicação multi tarefa, as _threads_ e as _ISRs_ são basicamente entidades 
-separadas. Porém, visando atingir os objetivos da aplicação, elas devem trabalhar 
-juntas e trocar informações de varias formas.
+Em uma aplicação multi tarefa, as _threads_ e as _ISRs_ são basicamente entidades separadas. Porém, visando atingir os objetivos da aplicação, elas devem trabalhar juntas e trocar informações de varias formas.
 
 
 ### Sondagem periódica vs espera por evento
 
-A forma fácil de comunicar entre diferentes partes de um código é por variáveis 
-globais. Em certas situações, pode fazer sentido comunicar via variáveis globais, 
-mas muitas vezes este método tem desvantagens.
+A forma fácil de comunicar entre diferentes partes de um código é por variáveis globais. Em certas situações, pode fazer sentido comunicar via variáveis globais, mas muitas vezes este método tem desvantagens.
 
-Por exemplo, se você deseja sincronizar uma _thread_ para executar alguma ação 
-quando o valor de uma variável global altera, a _thread_ deve continuamente 
-sondar a variável, desperdiçando tempo de computação precioso e energia, e o 
-tempo de reação depende de como é feita a sondagem. 
+Por exemplo, se você deseja sincronizar uma _thread_ para executar alguma ação quando o valor de uma variável global altera, a _thread_ deve continuamente sondar a variável, desperdiçando tempo de computação precioso e energia, e o tempo de reação depende de como é feita a sondagem. 
 
-Uma melhor forma é suspender a _thread_ e aguardar e quando o esperado ocorrer 
-retoma-la. este método requer um pouco de suporte do sistema, para gerenciar as 
-operações por traz de suspender/retomar, mas tem a grande vantagem que uma 
-_thread_ suspensa não desperdiça tempo computacional e energia.
+Uma melhor forma é suspender a _thread_ e aguardar e quando o esperado ocorrer retoma-la. este método requer um pouco de suporte do sistema, para gerenciar as operações por traz de suspender/retomar, mas tem a grande vantagem que uma _thread_ suspensa não desperdiça tempo computacional e energia.
 
 ### Passando Mensagens
 
-Uma fila de mensagens é usualmente um _array_ de estruturas acessada em um formato 
-FIFO. _Threads_ ou _ISRs_ podem enviar mensagens para a fila (_queue_), e outras 
-_threads_ ou interrupções podem então consumi-las .
+Uma fila de mensagens é usualmente um _array_ de estruturas acessada em um formato FIFO. _Threads_ ou _ISRs_ podem enviar mensagens para a fila (_queue_), e outras _threads_ ou interrupções podem então consumi-las .
 
-_Threads_ podem bloquear enquanto esperam  por uma mensagem e como assim não 
-desperdiçar ciclos de CPU.
+_Threads_ podem bloquear enquanto esperam  por uma mensagem e como assim não desperdiçar ciclos de CPU.
 
 ### Semáforos
 
-Semáforos e especialmente semáforos binários, são usados comumente para passar 
-notificações entre diferentes partes do código, muitas vezes de _ISRs_ para 
-_threads_. Porém, elas tem uma semântica mais rica, especialmente em semáforos 
-de contagem e podem também ser usados para manter o controle do número de 
-recursos disponíveis (por exemplo total de posições em um buffer circular), 
-que de alguma maneira os coloca na fronteira com o gerenciamento de recursos 
-compartilhados.
+Semáforos e especialmente semáforos binários, são usados comumente para passar notificações entre diferentes partes do código, muitas vezes de _ISRs_ para _threads_. Porém, elas tem uma semântica mais rica, especialmente em semáforos de contagem e podem também ser usados para manter o controle do número de recursos disponíveis (por exemplo total de posições em um buffer circular), que de alguma maneira os coloca na fronteira com o gerenciamento de recursos compartilhados.
 
 ### _Flags_ de Eventos
 
-Uma _flag_ de evento é uma variável binária, representando uma condição especifica 
-que uma _thread_ pode aguardar. Quando a condição ocorre a _flag_ (bandeira) é 
-levantada e a _thread_ é retomada.
+Uma _flag_ de evento é uma variável binária, representando uma condição especifica que uma _thread_ pode aguardar. Quando a condição ocorre a _flag_ (bandeira) é levantada e a _thread_ é retomada.
 
-Múltiplas _flags_ podem ser agrupadas e as _threads_ podem ser informadas quando 
-todas ou algumas das _flags_ foram levantadas.
+Múltiplas _flags_ podem ser agrupadas e as _threads_ podem ser informadas quando todas ou algumas das _flags_ foram levantadas.
 
 ## Gerenciando recursos comuns
 
-Um recurso compartilhado é tipicamente uma variável (static ou global), uma 
-estrutura de dados, uma tabela (em memoria RAM), ou registradores em um 
-dispositivo de I/O, acessado em comum por diferentes partes do código.
+Um recurso compartilhado é tipicamente uma variável (static ou global), uma estrutura de dados, uma tabela (em memoria RAM), ou registradores em um dispositivo de I/O, acessado em comum por diferentes partes do código.
 
-Exemplos típicos são listas, alocadores de memória, dispositivos de armazenamento, 
-que todos precisam de um metodo para projetar contra acesso concorrente.
+Exemplos típicos são listas, alocadores de memória, dispositivos de armazenamento, que todos precisam de um metodo para projeter contra acesso concorrente.
 
-A técnica para obter acesso exclusivo a recursos compartilhados é criar 
-**seções criticas**, que temporariamente travam o acesso.
+A técnica para obter acesso exclusivo a recursos compartilhados é criar **seções criticas**, que temporariamente travam o acesso.
 
 {% comment %}
 updated with: 6484f7badf1bcc2d09b45134d61484785241d0d2
 {% endcomment %}
-
 ### Habilitando/desabilitando interrupções
 
-Quando o recurso é também acessado de uma _ISRs_, a solução típica para prevenir 
-uma _ISR_ de alta prioridade executar no meio de uma _thread_ ou ou outra _ISR_ 
-de menor prioridade, é temporariamente desabilitar as interrupções enquanto 
-usando os recursos compartilhados.
+Quando o recurso é também acessado de uma _ISRs_, a solução típica para prevenir uma _ISR_ de alta prioridade executar no meio de uma _thread_ ou ou outra _ISR_ de menor prioridade, é temporariamente desabilitar as interrupções enquanto usando os recursos compartilhados.
 
-A sobrecarga de desabilitar/habilitar interrupções é normalmente baixa e para 
-alguns dispositivos, como o Cortex-M[347] também, há até a possibilidade de 
-desabilitar interrupções parcialmente, de um nível de prioridade para baixo. 
-mantendo as prioridades mais baixas habilitadas.
+A sobrecarga de desabilitar/habilitar interrupções é normalmente baixa e para alguns dispositivos, como o Cortex-M[347] também, há até a possibilidade de desabilitar interrupções parcialmente, de um nível de prioridade para baixo. mantendo as prioridades mais baixas habilitadas.
 
-Embora aparentemente simples, esta técnica é muitas vezes mal utilizada em casos 
-de seções críticas aninhadas, quando a seção crítica interna permite 
-inadvertidamente interrupções, tornando o rastreamento de bugs muito difícil. 
-O método à prova de bala e correto para implementar as secções críticas é salvar 
-sempre o estado da interrupção inicial e restaurá-lo quando a seção crítica é 
-encerrada.
+Embora aparentemente simples, esta técnica é muitas vezes mal utilizada em casos de seções críticas aninhadas, quando a seção crítica interna permite inadvertidamente interrupções, tornando o rastreamento de bugs muito difícil. O método à prova de bala e correto para implementar as secções críticas é salvar sempre o estado da interrupção inicial e restaurá-lo quando a seção crítica é encerrada.
 
-Este método deve ser usado com cuidado, desde que manter a interrupção 
-desabilitada por muito tempo isso impacta na responsividade do sistema.
+Este método deve ser usado com cuidado, desde que mantenha a interrupção desabilitada por muito tempo isso impacta na responsividade do sistema.
 
-Tipicamente recursos que podem ser protegidos com seções criticas para interrupções 
-são buffers circulares, listas lincadas, _pool_ de memoria e etc.
+Tipicamente recursos que podem ser protegidos com seções criticas para interrupções são buffers circulares, listas lincadas, _pool_ de memoria e etc.
 
 ### Bloqueando/Desbloqueando o escalonador
 
-Se o recurso não é acessado de _ISRs_, uma solução simples para prevenir que 
-outras _threads_ acessem o recurso é temporariamente bloquear o escalonador, 
-desta forma trocas de contexto não podem ocorrer.
+Se o recurso não é acessado de _ISRs_, uma solução simples para prevenir que outras _threads_ acessem o recurso é temporariamente bloquear o escalonador, desta forma trocas de contexto não podem ocorrer.
 
-Bloqueando o escalonador tem o mesmo efeito que tornar a tarefa que bloqueou o 
-escalonador em uma tarefa de maior prioridade.
+Bloqueando o escalonador tem o mesmo efeito que tornar a tarefa que bloqueou o escalonador em uma tarefa de maior prioridade.
 
-De forma similar a interrupções de seção critica, a implementação da seção 
-critica do escalonador deve considerar chamadas aninhadas, e sempre salvar o 
-estado inicial do escalonador e restaura-lo quando a seção critica estiver finalizada.
+De forma similar a interrupções de seção critica, a implementação da seção critica do escalonador deve considerar chamadas aninhadas, e sempre salvar o estado inicial do escalonador e restaura-lo quando a seção critica estiver finalizada.
 
-Este método deve ser usado com cuidado, desde que mantendo o agendador bloqueado 
-por muito tempo interfere na responsividade do sistema.
+Este método deve ser usado com cuidado, desde que mantendo o agendador bloqueado por muito tempo a responsividade do sistema.
 
-### Semáforos contadores
+### semáforos contadores
 
-Semáforos contadores pode ser usados pra controlar acesso a recursos compartilhados 
-usados em _ISRs_, como buffers circulares.
+Semáforos contadores pode ser usados pra controlar acesso a recursos compartilhados usados em _ISRs_, como buffers circulares.
 
-Desde que ele pode ser afetado pela inversão de prioridade, eles são uados para 
-gerenciar recursos que devem ser usados com certo cuidado.
+Desde que ele pode ser afetado pela inversão de prioridade, eles são uados para gerenciar recursos que devem ser usados com certo cuidado.
 
 ### Exclusão Mutua (_mutex_)
 
-Este é o método preferido para acessar recursos compartilhados, especialmente 
-se as _threads_ que precisam acessar um recurso compartilhado tenham prazos 
-(_deadline_).
+Este é o método preferido para acessar recursos compartilhados, especialmente se as _threads_ precisam acessar um recurso compartilhado tenham prazos (_deadline_).
 
-O _Mutex_ do µOS++ tem um mecanismos de herança interno, que evita inversão de 
-prioridade ilimitada.
+_Mutex_ do µOS++ tem um mecanismos de herança interno, que evita inversão de prioridade ilimitada.
 
-Porém , _mutexes_ são levemente lentos (em tempo de execução) do semáforos desde 
-que a prioridade do proprietário pode ser alterada, o que exige mais processamento 
-da CPU.
+Porém , _mutexes_ são levemente lentos (em tempo de execução) do semáforos desde que a prioridade do proprietário pode ser alterada, o que exige mais processamento da CPU.
 
 ### Quando se deve usar um semáforo ou um _mutex_?
 
 Um semáforo deve ser usado quando recursos são compartilhados com uma _ISR_.
 
-Um semáforo pode ser usado ao invés de um _mutex_ se nenhuma das _threads_ 
-competir por um recurso compartilhado tendo prazos (_deadlines_) a serem 
-satisfeitos.
+Um semáforo pode ser usado ao invés de um _mutex_ se nenhuma das _threads_ competir por um recurso compartilhado tendo prazos (_deadlines_) a serem satisfeitos.
 
-Porém, se há prazos a serem respeitados, você deve usar um _mutex_ antes de 
-acessar o recurso. Semáforos são sujeitos a inversão de prioridades ilimitados, 
-enquanto _mutexes_ não são. De outra forma, _mutexes_ não podem ser usados em 
-interrupções, desde que eles precisam uma _thread_ que seja seu dono.
+Porém, se há prazos a serem respeitados, você deve usar um _mutex_ antes de acessar o recurso. Semáforos são sujeitos a inversão de prioridades ilimitados, enquanto _mutexes_ não são. De outra forma, _mutexes_ não podem ser usados em interrupções, desde que eles precisam uma _thread_ que seja seu dono.
 
 ### Trava da morte (Deadlock ou deadly embrace)
 
-A trava da morte (_deadlock_), também chamada de abraço da morte 
-(_deadly embrace_), é uma situação em que duas _threads_ estão sem saber 
-aguardando um recurso requerido pela outra.
+A trava da morte (_deadlock_), também chamada de abraço da morte (_deadly embrace_), é uma situação em que duas _threads_ estão sem saber aguardando um recurso requerido pela outra.
 
-Considere o seguinte cenário quando ambas as  _thread_ A e  _thread_ B  precisam 
-adquirir o _mutex_ X e _mutex_ Y para executar uma ação:
+Considere o seguinte cenário quando ambas as  _thread_ A e  _thread_ B  precisam adquirir o _mutex_ X e _mutex_ Y para executar uma ação:
 
- - _Thread_ A executa e com sucesso trava o _mutex_ X;
- - _Thread_ A é preemptada pela _thread_ B;
- - _Thread_ B trava com sucesso o _mutex_ Y antes de tentar também travar o 
-   _mutex_ X, mas o _mutex_ X está preso pela _thread_ A, portanto não está 
-   disponível para a _thread_ B. _Thread_ B opta por entrar em modo de espera 
-   (_wait_) até que o _mutex_ X seja liberado;
- - _Thread_ A continua sua execução. Ela tenta travar o _mutex_ Y, mas o _mutex_ 
-   Y está travado pela _thread_ B, por tanto não está disponível para a _thread_ 
-   A. _Thread_ A opta por aguardar o _mutex_ Y ser liberado.
+- _Thread_ A executa e com sucesso trava o _mutex_ X;
+- _Thread_ A é preemptada pela _thread_ B;
+- _Thread_ B trava com sucesso o _mutex_ Y antes de tentar também travar o _mutex_ X, mas o _mutex_ X está preso pela _thread_ A, portanto não está disponível para a _thread_ B. _Thread_ B opta por entrar em modo de espera (_wait_) até que o _mutex_ X seja liberado;
+- _Thread_ A continua sua execução. Ela tenta travar o _mutex_ Y, mas o _mutex_ Y está travado pela _thread_ B, por tanto não está disponível para a _thread_ A. _Thread_ A opta por aguardar o _mutex_ Y ser liberado.
 
-No fim deste cenário, _thread_ A está aguardando pelo _mutex_ bloqueado pela 
-_thread_ B, e _thread_ B está aguardando pelo _mutex_ bloqueado pela _thread_ 
-A. _Deadlock_ ocorre porque nenhuma das _threads_ podem continuar.
 
-Com a inversão de prioridade, o melhor método de evitar _deadlock_ é considerar 
-seu potencial em tempo de desenvolvimento, e desenvolver o sistema para assegurar 
-que o _deadlock_ não irá acontecer.
+No fim deste cenário, _thread_ A está aguardando pelo _mutex_ bloqueado pela _thread_ B, e _thread_ B está aguardando pelo _mutex_ bloqueado pela _thread_ A. _Deadlock_ ocorre porque nenhuma das _threads_ podem continuar.
+
+Com a inversão de prioridade, o melhor método de evitar _deadlock_ é considerar seu potencial em tempo de desenvolvimento, e desenvolver o sistema para assegurar que o _deadlock_ não irá acontecer.
 
 A seguinte técnica pode ser usada para evitar _deadlocks_:
 
- - Não adquirir mais que um _mutex_ de cada vez;
- - Não adquirir um _mutex_ diretamente (por exemplo: oculte dentro de chamada 
-   a um driver e bibliotecas reentrantes);
- - Adquira todos os recursos antes de prosseguir;
- - Adquira recursos na mesma ordem;
+- Não adquirir mas que um _mutex_ de cada vez;
+- Não adquirir um _mutex_ diretamente (por exemplo: oculte dentro de chamada a um driver e bibliotecas reentrantes);
+- Adquira todos os recursos antesd e prosseguir;
+- Adquira recursos na mesma ordem;
 
 ## Alocação de Objetos Estaticamente vs Dinamicamente
 
-Muitos objetos de sistemas são auto suficientes, e a regra é que se os requisitos 
-de armazenamento sejam conhecidos, constantes e idênticos para todas as instâncias, 
-então o armazenamento deve ser alocado nos dados da instancia do objeto.
+Muitos objetos de sistemas são auto suficientes, e a regra é que se os requisitos de armazenamento sejam conhecidos, constantes e idênticos para todas as instâncias, então o armazenamento deve ser alocado nos dados da instancia do objeto.
 
-Porém, alguns objetos de sistema requerem memória adicional, diferente de uma 
-instância para outra. Exemplos para tais objetos são _threads_ (que requerem 
-pilhas (_stacks_)), filas de mensagens e bancos (_pool_) de memória.
+Porém, alguns objetos de sistema requerem memoria adicional, diferente de uma instancia para outra, Exemplos para tais objetos são _threads_ (que requerem pilhas (_stacks_)), filas de mensagens e bancos (_pool_) de memória.
 
-Esta memória adicional pode ser alocada ou estaticamente (em tempo de compilação) 
-ou dinamicamente (em tempo de execução).
+Esta memória adicional pode ser alocada ou estaticamente (em tempo de compilação) ou dinamicamente (em tempo de execução).
 
 Por padrão, todas as classes base usam o alocador do sistema para obter memória.
 
 Em C++ tais classes são tratadas por _templates_ que tratam tais alocações.
 
-Outra solução, também disponível para API C, é passar a áreas de armazenamento 
-definidas pelo usuário via atributos usados durante a criação dos objetos.
+Outra solução, também disponível para C API, é passar áreas de armazenamento definidas pelo usuário via atributos usados durante a criação dos objetos.
 
 ### O Alocador do Sistema
 
-Para todos os objetos que podem precisar de memória, o µOS++ usa o alocador do 
-sistema `os::rtos::memory::allocator<T>`, que por padrão é mapeado para um 
-alocador que usa as primitivas padrão new/delete, alocando armazenamento no 
-_heap_.
+Para todos os objetos que podem precisar de memória, o µOS++ usa o alocador do sistema `os::rtos::memory::allocator<T>`, que por padrão é mapeado para um alocador que usa as primitivas padrão new/delete, alocando armazenamento no _heap_.
 
-Este alocador é um alocador padrão do C++. O usuário pode definir outro alocador 
-padrão, e configurar o alocador de sistema para usa-lo, assim personalizando o 
-comportamento de todos os objetos de sistema.
+Este alocador é um alocador padrão do C++. O usuário pode definir outro alocador padrão, e configurar o alocador de sistema para usa-lo, assim personalizando o comportamento de todos os objetos de sistema.
 
-Ainda mais, objetos de sistemas que precisam de memória são definidos como 
-templates, que pode ser parametrizados com um alocador, por tanto, no limite, 
-cada objeto pode ser construído com seu próprio alocador em separado.
+Ainda mais, objetos de sistemas que precisam de memoria são definidos como templates, que pode ser parametrizados com um alocador, por tanto, no limite, cada objeto pode ser construído com seu próprio alocador em separado.
 
 ### Fragmentação
 
-O grande problema com referência ao uso de memoria dinâmica é a fragmentação, 
-uma condição que pode gerar um sistema inútil.
+O grande problema com referência ao uso de memoria dinâmica é a fragmentação, uma condição que pode gerar um sistema inútil.
 
-Observe que internamente µOS++ não faz uso de alocação dinâmica no todo, porém 
-se a aplicação é cuidadosa o suficiente para não usar objetos que precisam de 
-alocação dinâmica, o código resultante é totalmente estático.
+Observe que internamente µOS++ não faz uso de alocação dinâmica no todo, porém se a aplicação é cuidadosa o suficiente para não ubjetos que precisam de alocação dinâmica, o código resultante é totalmente estático.
 
-## Relógio Real-Time
+## Relógio Real-time
 
 Muitas aplicações tratam o tempo através do uso de um temporizador.
 
-Porem, aplicações de baixo consumo, optam por colocar a CPU em modo de sono 
-profundo (_deep sleep_), que usualmente desliga muitos periféricos, incluindo 
-o temporizador.
+Porem aplicações de baixo consumo, optam por colocar a CPU em modo de sono profundo (deep sleep), que usualmente desliga muitos periféricos, incluindo o temporizador.
 
-Para esta situação um relógio de tempo real (RTC) de baixo consumo separado é 
-necessário; alimentado por uma fonte de energia separada, possivelmente uma 
-bateria, este relógio, funciona quando o resto do dispositivo está suspenso.
+Para esta situação um relógio de tempo real (RTC) de baixo consumo separado é necessário; alimentado por uma fonte de energia separada, possivelmente uma bateria, este relógio roda quando o resto do dispositivo está suspenso.
 
-Este relógio não apenas mantem o controle do tempo, ele também dispara 
-interrupções para acordar a CPU em momentos necessários.
+Este relógio não apenas mantem o controle do tempo, ele também dispara interrupções para acordar a CPU em momentos necessários.
 
 A resolução típica do relógio real-time é 1 sec.
 
@@ -845,31 +704,12 @@ A resolução típica do relógio real-time é 1 sec.
 
 ### Kernel
 
-Muitos autores também fazem referência a seus RTOSes como "kernels" (núcleos). 
-Bem, mesmo que _OS_ em um RTOS é o padrão para sistema operacional 
-(_oprating system_), esta definição é de alguma maneira estendida ao limite, 
-já que em sistemas embarcados do tipo _bare-metal_ o que é chamado de 
-[Sistema Operacional](https://pt.wikipedia.org/wiki/Sistema_operativo) é apenas 
-uma coleção de funções que tratam de trocas e sincronizações, ligado (_linked_) 
-com a aplicação formando um executável monolítico.
+Muitos autores também fazerem referencia a seus RTOSes como "kernels" (núcleos). Bem, mesmo que _OS_ em um RTOS é o padrão para _oprating system_ (sistema operacional), esta definição é de alguma maneira estendida ao limite, já que em sistemas embarcados do tipo _bare-metal_ o que é chamado de [Sistema Operacional](https://pt.wikipedia.org/wiki/Sistema_operativo) é apenas uma coleção de funções que tratam de trocas e sincronizações, ligado (_linked_) com a aplicação de uma formando um executável monolítico.
 
-Como tal, o termo [kernel (núcleo)](https://pt.wikipedia.org/wiki/N%C3%BAcleo_(sistema_operacional)) 
-é ainda mais inapropriado, já que não há um componente distinto para gerenciar 
-todos os recursos disponíveis (memória, CPU, I/O, etc) e prover então para a 
-aplicação de uma forma controlada; muito do tempo, a aplicação tem total controle 
-sobre todo o espaço de memória, como para sistemas com memória mapeada para 
-periféricos, também tem total controle sobre o I/O.
+como tal, o termo [kernel (núcleo)](https://pt.wikipedia.org/wiki/N%C3%BAcleo_(sistema_operacional)) é ainda mais inapropriado, já que não há um componente distinto para gerenciar todos os recursos disponíveis (memoria, CPU, I/O, etc) e prover então para a aplicação de uma forma controlada; muito do tempo, a aplicação tem total controle sobre todo o espaço de memória, como para sistemas com memoria mapeada para periféricos, também tem total controle sobre o I/O.
 
-A única função especifica de um _kernel_ disponível no sistema embarcado 
-_bare-metal_ é o gerenciamento da CPU; com múltiplas _threads_ compartilhando 
-a CPU provavelmente um nome mais apropriada para o _core_ do RTOS é **scheduler** 
-(Escalonador); A documentação do µOS++ IIIe usa o termo Sistema Operacional
-(_operating system_) em sua definição explicita tentando evitar o termo _kernel_.
+A única função especifica de um _kernel_ disponível no sistema embarcado _bare-metal_ é o gerenciamento da CPU; com múltiplas _threads_ compartilhando a CPU provavelmente um nome mais apropriada para o _core_ do RTOS é **scheduler** (Escalonador); A documentação do µOS++ IIIe usa o termo _operating system_ (Sistema Operacional) em sua definição explicita tentando evitar o termo _kernel_.
 
 ### Tasks vs threads
 
-Muitos autores preferem _threads_ do _task_ (e no português usamos tarefa). 
-Falando estritamente, [threads](https://pt.wikipedia.org/wiki/Escalonamento_de_processos#Threads) 
-(juntamente com [processos](https://pt.wikipedia.org/wiki/Escalonamento_de_processos) 
-são primitivas do sistema usadas para rodar multiplas tarefas em paralelos em 
-um sistema multi tarefa.
+Muitos autores preferem _threads_ como "task" (e no português usamos tarefa). Falando estritamente, [threads](https://pt.wikipedia.org/wiki/Escalonamento_de_processos#Threads) (juntamente com [processos](https://pt.wikipedia.org/wiki/Escalonamento_de_processos) são primitivas do sistema usadas para rodar multiplas tarefas em paralelos em um sistema multi tarefa.
