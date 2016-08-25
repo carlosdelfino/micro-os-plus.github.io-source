@@ -16,27 +16,29 @@ start_translate_at:  2016-08-24 20:30:00 +0300
 
 {% endcomment %}
 
-## Overview
+## Visão Geral
 
-Semaphores are one of the oldest mechanisms introduced by multitasking systems, being used both for managing common resources and synchronisation.
+Semáforos são um dos mais antigos mecanismos introduzidos pelos sistemas multi tarefas, sendo usado tanto para gerenciar recursos comuns como sincronização.
 
-Managing common resources, in its simple form, prevents several threads to concurrently use a shared resource by blocking access of all other threads until the thread that acquired the resource releases it.
+Gerenciando recursos comuns, no seu formato mais simples, evita varias _threads_ concorrer pelo uso de um recurso compartilhado pelo bloqueio do acesso de todas as outras _threads_ até a _thread_ que adquiriu o recuso o libere.
 
-Synchronisation is generally required to efficiently implement blocking I/O; when a thread requires some data that is not yet available (for example by performing a `read()`), it is not efficient to poll until the data becomes available, but it is much better to suspend the thread and arrange for the data producer (usually an ISR) to resume the thread when the data is available.
+Sincronização é geralmente requerida para eficientemente implementar bloqueio de I/O; quando uma _thread_ requer algum dado que não está ainda disponível (por exemplo para executar um `read()`), ele não é eficiente para efetuar sondar até que os dados se tornem disponíveis, mas é muito melhor que suspender a _thread_ e preparar para que o produtor de dados (normalmente um ISR) retome a _thread_  quando o dado está disponível.
 
-In µOS++ there are two basic synchronisations mechanisms: **semaphores** and **event flags**.
 
-A [semaphore](https://en.wikipedia.org/wiki/Semaphore_(programming)) is a synchronisation mechanism offered by most multitasking systems. In its simplest form, a semaphore is similar to the real-world traffic light, which blocks access to a segment of road in certain conditions.
+No µOS++ há dois mecanismos básicos de sincronização: **semáforos** e **_flags_ de eventos**.
 
-The semaphore concept was introduced in 1965 by the Dutch computer scientist [Edsger Dijkstra](https://en.wikipedia.org/wiki/Edsger_Dijkstra) and historically it is said to be inspired by the railway semaphore (the binary semaphore, which controls access to a single resource by bracing the critical section with the `P(S)` and `V(S)` primitives).
+Um [semáforo](https://pt.wikipedia.org/wiki/Sem%C3%A1foro_(computa%C3%A7%C3%A3o)) é um mecanismo de sincronização oferecido pela maioria dos sistemas multitarefas. Em sua forma mais simples, um semáforo é similar a um semáforo de transito no mundo real, que bloqueia o acesso a um seguimento da rodovia em certas condições.
+
+O conceito de semáforo foi introduzido em 1965 pelo cientista da computação holandês  [Edsger Dijkstra](https://pt.wikipedia.org/wiki/Edsger_Dijkstra) e historicamente ele diz ter sido inspirado pelo sistema de semáforo das rodovias (o semáforo binário, que controla acesso para um simples recurso pela separação da seção critica através de primitivas `P(S)` e `V(S)`).
 
 <div style="float:right; margin-left: 10px;">
 <img src="{{ site.baseurl }}/assets/images/2016/160px-Rail-semaphore-signal-Dave-F.jpg" />
 </div>
 
-The concept was later extended by another Dutchman, Carel S. Scholten, to control access to an arbitrary number of resources. In his proposal the semaphore can have an initial value (or count) greater than one (thus the counting semaphore).
+O conceito foi depois estendido por outro Holandes, Carel S. Scholten, para controlar acesso para um número arbitrário de recursos. Nesta proposta o semáforo pode ter um valor inicial (ou contar) maior que um (um semáforo de contagem).
 
-Semaphores were originally used to control access to shared resources. However, depending on the application, better mechanisms exist now to manage shared resources, like locks, mutexes, etc. Semaphores are best used to synchronize a thread with an ISR or with another thread (unilateral rendezvous).
+Semáforos foram originalmente usados para controlar acesso a recursos compartilhados. Porém, dependendo da aplicação, o melhor mecanismo existe agora para gerenciar recursos compartilhados, como travas, mutexes, etc. Semáforos são melhores usados para sincronizar uma _thread_ com uma ISR ou outra _thread_ (ponto de encontro unilateral).
+
 
 ## Semaphore types
 
