@@ -29,7 +29,7 @@ No µOS++ há dois mecanismos básicos de sincronização: **semáforos** e **_f
 
 Um [semáforo](https://pt.wikipedia.org/wiki/Sem%C3%A1foro_(computa%C3%A7%C3%A3o)) é um mecanismo de sincronização oferecido pela maioria dos sistemas multitarefas. Em sua forma mais simples, um semáforo é similar a um semáforo de transito no mundo real, que bloqueia o acesso a um seguimento da rodovia em certas condições.
 
-O conceito de semáforo foi introduzido em 1965 pelo cientista da computação holandês  [Edsger Dijkstra](https://pt.wikipedia.org/wiki/Edsger_Dijkstra) e historicamente ele diz ter sido inspirado pelo sistema de semáforo das rodovias (o semáforo binário, que controla acesso para um simples recurso pela separação da seção critica através de primitivas `P(S)` e `V(S)`).
+O conceito de semáforo foi introduzido em 1965 pelo cientista da computação holandês  [Edsger Dijkstra](https://pt.wikipedia.org/wiki/Edsger_Dijkstra) e historicamente ele diz ter sido inspirado pelo sistema de semáforo das ferrovias (o semáforo binário, que controla acesso para um simples recurso pela separação da seção critica através de primitivas `P(S)` e `V(S)`).
 
 <div style="float:right; margin-left: 10px;">
 <img src="{{ site.baseurl }}/assets/images/2016/160px-Rail-semaphore-signal-Dave-F.jpg" />
@@ -39,42 +39,42 @@ O conceito foi depois estendido por outro Holandes, Carel S. Scholten, para cont
 
 Semáforos foram originalmente usados para controlar acesso a recursos compartilhados. Porém, dependendo da aplicação, o melhor mecanismo existe agora para gerenciar recursos compartilhados, como travas, mutexes, etc. Semáforos são melhores usados para sincronizar uma _thread_ com uma ISR ou outra _thread_ (ponto de encontro unilateral).
 
+## Tipos de Semáforos
 
-## Semaphore types
+Há dois tipos de semáforos: **binários** e **contagem**
 
-There are two types of semaphores: **binary** and **counting**.
+Atenção: no µOS++, mesmo que semáforos binários ou de contagens sejam definidos por classes diferentes, o objeto criado são atualmente os mesmos, mas construídos com parâmetros diferentes; semáforos binários são de fato semáforos contadores com o valor máximo definido para 1.
 
-Note: In µOS++, even if binary and counting semaphores are defined by different classes, the objects created are actually the same, but constructed with different parameters; binary semaphores are in fact counting semaphores with the maximum value set to 1.
+### Semáforos binários 
 
-### Binary semaphores
+Já que nós mencionamos a analogia com um sistema ferroviário, permita imaginarmos ter uma pequena estação de trem, com uma simples plataforma. O primeiro trem a chegar na estação sem alguma restrição, e parar na plataforma. Para evitar um segundo trem de entrar na estação e bater no primeiro, um semáforo é instalado a certa distância antes da estação. O semáforo da ferrovia tem uma mão vermelha que pode ou estar elevado ou baixado. Semáforos modernos são elétricos, e também tem luzes (vermelho e verde). Aós o primeiro trem entrar na estação, a mão é baixada e a luz se torna vermelha. Se um segundo trem chega, ele lé isto como "parar" e esperar. Quando o primeiro trem deixa a estação, o semáforo se alterna a luz se torna verde e o segundo trem pode entrar na estação.
 
-Since we mentioned the analogy with the railway system, let's imagine we have a small train station, with a single platform. The first arriving train enters the station without any restrictions, and stops at the platform. To prevent a second train from entering the station and bumping onto the first, a semaphore is installed at a certain distance before the station. The railway semaphore has a red hand which can be either lowered or raised. Modern semaphores are electric, and also have lights (red and green). After the first train enters the station, the hand is lowered and the light turns red. If a second train arrives, it reads this as "stop" and waits. When the first train leaves the station, the semaphore arm swings up, the light turns green, and the second train can enter the station.
+Como um semáforo de rodovia que tem dois estados, um semáforo binário tem somente dois valores, 0 ou 1. Se o valor é 0, o recurso associado com o semáforo não está disponível, e qualquer um que precisar dele, tem que esperar, como trem que parou no semáforo vermelho. quando o recurso se torna disponível, o semáforo é "postado", permitindo o segundo trem aguardando pelo semáforo para continuar.
 
-Like a railway semaphore which has two states, a binary semaphore has only two values, 0 or 1. If the value is 0, the resource associated with the semaphore is not available, and whoever needs it, must wait, like the train that stops at a red semaphore. When the resource becomes available, the semaphore is "posted", allowing the next thread waiting for the semaphore to resume.
+Dependendo do uso do semáforo, ele pode iniciar ou com 0 (quando usado para sincronização) ou com 1 (quando usado para proteger um simples recursos compartilhado).
 
-Depending on the semaphore usage, it can start either with 0 (when used for synchronisation) or 1 (when used to protect a single shared resource).
+O que um semáforo binário tem a mais que um semáforo de ferrovia, é um método de sinalização (pense neste mecanismo como uma corneta alta usada para acordar o maquinas que dorme, aguardando o semáforo).
 
-What a binary semaphore has in addition to a railway semaphore, is a signaling method (think of this mechanism as a loud horn used to wakeup the sleeping train driver, waiting for the semaphore).
+### Semáforo de Contagem
 
-### Counting semaphores
+Para continuar a analogia com o sistema ferroviário, e se nos tempos uma grande estação de trem, com múltiplas plataformas, onde muitos trens podem estar presente ao mesmo tempo? Bem, a solução é similar, mas a lógica do semáforo manter o controle sobre o número de trens na estação, e acender a luz vermelha quando todas os trilhos estiverem ocupados. Quando um trem deixa a estação, o semáforo pode ser tornar verde e se há um trem aguardando, ele será permitido entrar na estação.
 
-To continue the analogy with the railway system, what if we have a larger train station, with multiple platforms, where many trains can be present at the same time? Well, the solution is similar, but the semaphore logic should keep track of the number of trains in the station, and turn red when all tracks are busy. When one train leaves the station, the semaphore can be turned green, and, if there is a train waiting, it'll be allowed to enter the station.
+Um semáforo de contagem tem um contador com um limite, representando o número máximo de recursos disponíveis.
 
-A counting semaphore has a counter with a limit, representing the maximum number of available resources.
+Dependendo do uso do semáforo, ele usualmente inicia ou com 0 (quando usado para sincronização) ou em seu limite (quando usado para proteger múltiplos recursos compartilhados).
 
-Depending on the semaphore usage, it usually starts either at 0 (when used for synchronisation) or at the limit (when used to protect a multiple shared resources).
+Assumindo que ele inicia em zero, com nenhum recurso disponível, o semáforo é "postado" cada vez um novo recurso se torna disponível, que incrementa o o contador. Quando o máximo é atingido, "postagens" futuras falharam e o contador se mantem inalterado.
 
-Assuming it starts at zero, with no resources available, the semaphore is "posted" each time a new resource becomes available, which increments the counter. When the maximum is reached, further "posts" will fail and the counter will remain unchanged.
+No outro lado, quando recursos precisam ser consumidos, e quanto o contador é positivos, a _thread_ requerente será permitida acessar o recurso e cada requisição, o contador será decrementado.
 
-On the other side, when resources need to be consumed, as long as the counter is positive, the requesting thread will be allowed access to the resource, and, at each request, the counter will be decremented.
+Quando o contador atinge 0, nenhum recurso está mais disponível e a _thread_ requerente é suspendida, até o semáforo ser postado.
 
-When the counter reaches 0, no more resources are available, and the requesting thread is suspended, until the semaphore will be posted.
+Um semáforo de contagem é usado quando elementos de um recurso pode ser usados por mais que uma _thread_ ao mesmo tempo. Por exemplo, um semáforo de contagem pode ser usado no gerenciamento da área do buffer.
 
-A counting semaphore is used when elements of a resource can be used by more than one thread at the same time. For example, a counting semaphore can be used in the management of a buffer pool.
 
 <div style="text-align:center">
 <img src="{{ site.baseurl }}/assets/images/2016/semaphore.png" />
-<p>Semaphore services</p>
+<p>Serviço de semáforo</p>
 </div>
 
 ## Creating semaphores
