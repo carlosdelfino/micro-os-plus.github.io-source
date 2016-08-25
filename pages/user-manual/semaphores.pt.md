@@ -77,15 +77,15 @@ Um semáforo de contagem é usado quando elementos de um recurso pode ser usados
 <p>Serviço de semáforo</p>
 </div>
 
-## Creating semaphores
+## Criando semáforos
 
-For convenience reasons, µOS++ has several functions for creating semaphores. Semaphores can be created as local objects on the function stack, or as global objects, semaphores can be binary, or counting, semaphores can be created with default characteristics or with custom attributes, and so on.
+Por questões de convenção, µOS++ tem vários funções pra criação de semáforos. Semáforos pode ser criados como objetos locais no na pilha da função, ou como objetos globais, semáforos pode ser binário, ou de contagem, semáforos podem ser criados com características padrões ou com atributos personalizados, e assim por diante.
 
-When used to synchronise threads with ISRs, the easiest way to access semaphores is when they are created as global objects.
+Quando usado para sincronizar _threads_ com ISRs, a forma mais simples para acessar semáforo é quando ele são criados como objetos globais.
 
-The initial value for the semaphore is typically zero (0), indicating that the event has not yet occurred, or there are no resources. It is possible to initialize the semaphore with a value other than zero, indicating that the semaphore initially contains that number of resources.
+O valor inicial para o semáforo é tipicamente zero (0), indicando que o evento não tem ainda ocorrido, ou não há recursos. É possível inicializar o semáforo com um valor diferente de zero, indicando que o semáforo inicialmente contem o número de recursos.
 
-In C++, the global semaphores are created and initialised by the global static constructors mechanism.
+Em C++, os semáforos globais são criados e inicializados pelo mecanismo de construtor estático global.
 
 ``` cpp
 /// @file app-main.cpp
@@ -128,7 +128,7 @@ os_main (int argc, char* argv[])
 
 ```
 
-A similar example, but written in C:
+Um exemplo similar, mas escrito em C:
 
 ``` c
 /// @file app-main.c
@@ -173,7 +173,7 @@ os_main (int argc, char* argv[])
 }
 ```
 
-In C++, if it is necessary to control the moment when global objects instances are created, it is possible to separately allocate the storage as global variables, then use the placement `new` operator to initialise them.
+Em C++, se ele é necessário controlar o momento quando as instancias de objetos globais são criados, é possível separadamente alocar o armazenamento de variáveis globais, então usa a declaração com o operador `new` para então inicializa-lo.
 
 ``` c++
 /// @file app-main.cpp
@@ -217,7 +217,7 @@ os_main (int argc, char* argv[])
 }
 ```
 
-Semaphore objects instances can also be created on the local stack, for example on the main thread stack. Just be sure the stack is large enough to store all defined local objects.
+Instâncias de objetos de semáforo podem também ser criadas na pilha local, por exemplo na pilha de _thread_ principal. Tenha certeza que a pilha é grande o suficiente para gravar todos os objetos locais definidos.
 
 ``` cpp
 /// @file app-main.cpp
