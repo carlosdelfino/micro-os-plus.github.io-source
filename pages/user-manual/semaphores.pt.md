@@ -7,7 +7,7 @@ author: Liviu Ionescu
 translator: Carlos Delfino
 
 date: 2016-07-12 10:36:00 +0300
-last_updated_at:  2016-08-24 20:30:00 +0300
+last_updated_at:  2016-08-26 17:30:00 +0300
 
 ---
 {% comment %}
@@ -35,7 +35,7 @@ O conceito de semáforo foi introduzido em 1965 pelo cientista da computação h
 <img src="{{ site.baseurl }}/assets/images/2016/160px-Rail-semaphore-signal-Dave-F.jpg" />
 </div>
 
-O conceito foi depois estendido por outro Holandes, Carel S. Scholten, para controlar acesso para um número arbitrário de recursos. Nesta proposta o semáforo pode ter um valor inicial (ou contar) maior que um (um semáforo de contagem).
+O conceito foi depois estendido por outro Holandês, Carel S. Scholten, para controlar acesso para um número arbitrário de recursos. Nesta proposta o semáforo pode ter um valor inicial (ou contar) maior que um (um semáforo de contagem).
 
 Semáforos foram originalmente usados para controlar acesso a recursos compartilhados. Porém, dependendo da aplicação, o melhor mecanismo existe agora para gerenciar recursos compartilhados, como travas, mutexes, etc. Semáforos são melhores usados para sincronizar uma _thread_ com uma ISR ou outra _thread_ (ponto de encontro unilateral).
 
@@ -49,7 +49,7 @@ Atenção: no µOS++, mesmo que semáforos binários ou de contagens sejam defin
 
 Já que nós mencionamos a analogia com um sistema ferroviário, permita imaginarmos ter uma pequena estação de trem, com uma simples plataforma. O primeiro trem a chegar na estação sem alguma restrição, e parar na plataforma. Para evitar um segundo trem de entrar na estação e bater no primeiro, um semáforo é instalado a certa distância antes da estação. O semáforo da ferrovia tem uma mão vermelha que pode ou estar elevado ou baixado. Semáforos modernos são elétricos, e também tem luzes (vermelho e verde). Aós o primeiro trem entrar na estação, a mão é baixada e a luz se torna vermelha. Se um segundo trem chega, ele lé isto como "parar" e esperar. Quando o primeiro trem deixa a estação, o semáforo se alterna a luz se torna verde e o segundo trem pode entrar na estação.
 
-Como um semáforo de rodovia que tem dois estados, um semáforo binário tem somente dois valores, 0 ou 1. Se o valor é 0, o recurso associado com o semáforo não está disponível, e qualquer um que precisar dele, tem que esperar, como trem que parou no semáforo vermelho. quando o recurso se torna disponível, o semáforo é "postado", permitindo o segundo trem aguardando pelo semáforo para continuar.
+Como um semáforo de ferrovia que tem dois estados, um semáforo binário tem somente dois valores, 0 ou 1. Se o valor é 0, o recurso associado com o semáforo não está disponível, e qualquer um que precisar dele, tem que esperar, como trem que parou no semáforo vermelho. quando o recurso se torna disponível, o semáforo é "informado" (posted), permitindo o segundo trem aguardando pelo semáforo para continuar.
 
 Dependendo do uso do semáforo, ele pode iniciar ou com 0 (quando usado para sincronização) ou com 1 (quando usado para proteger um simples recursos compartilhado).
 
@@ -63,11 +63,11 @@ Um semáforo de contagem tem um contador com um limite, representando o número 
 
 Dependendo do uso do semáforo, ele usualmente inicia ou com 0 (quando usado para sincronização) ou em seu limite (quando usado para proteger múltiplos recursos compartilhados).
 
-Assumindo que ele inicia em zero, com nenhum recurso disponível, o semáforo é "postado" cada vez um novo recurso se torna disponível, que incrementa o o contador. Quando o máximo é atingido, "postagens" futuras falharam e o contador se mantem inalterado.
+Assumindo que ele inicia em zero, com nenhum recurso disponível, o semáforo é "informado" (posted) cada vez um novo recurso se torna disponível, que incrementa o o contador. Quando o máximo é atingido, "informes" (posts) futuras falharão e o contador se mantem inalterado.
 
 No outro lado, quando recursos precisam ser consumidos, e quanto o contador é positivos, a _thread_ requerente será permitida acessar o recurso e cada requisição, o contador será decrementado.
 
-Quando o contador atinge 0, nenhum recurso está mais disponível e a _thread_ requerente é suspendida, até o semáforo ser postado.
+Quando o contador atinge 0, nenhum recurso está mais disponível e a _thread_ requerente é suspendida, até o semáforo ser informado.
 
 Um semáforo de contagem é usado quando elementos de um recurso pode ser usados por mais que uma _thread_ ao mesmo tempo. Por exemplo, um semáforo de contagem pode ser usado no gerenciamento da área do buffer.
 
@@ -258,7 +258,7 @@ os_main (int argc, char* argv[])
 }
 ```
 
-A similar example, but written in C:
+Um exemplo similar, mas escrito em C:
 
 ``` c
 /// @file app-main.c
@@ -309,7 +309,7 @@ os_main (int argc, char* argv[])
 }
 ```
 
-For a total control over the semaphore creation (for example to set a custom clock), the semaphore attribute mechanism can be used.
+Para um total controle sobre a criação de semáforo (por exemplo para definir um relógio personalizado), o mecanismo de atributo do semáforo pode ser usado.
 
 ``` cpp
 /// @file app-main.cpp
@@ -355,7 +355,7 @@ os_main (int argc, char* argv[])
 }
 ```
 
-A similar example, but written in C:
+Um exemplo similar, mas escrito em C:
 
 ``` c
 /// @file app-main.c
@@ -415,13 +415,13 @@ os_main (int argc, char* argv[])
 }
 ```
 
-The application programmer can create an unlimited number of semaphores (limited only by the available RAM).
+O programador da aplicação pode ser criado com um número de ilimitado de semáforos (limitado somente pela memória RAM disponível).
 
-## Posting to semaphores
+## Informando ao semáforo
 
-When one resource associated with the semaphore becomes available, the semaphore is notified.
+Quando um recurso associado com o semáforo se torna disponível, o semáforo é notificado.
 
-The name **post** comes from POSIX; other names used are **P**, **signal**, **release**.
+O nome **post** (Informe) vem do POSIX; outros nomes usados são **p**, **signal**, **release**.
 
 ``` cpp
 result_t res;
@@ -436,7 +436,7 @@ else if (res == EGAIN)
   }
 ```
 
-A similar example, but written in C:
+Um exemplo similar, mas escrito em C:
 
 ``` c
 os_result_t res;
@@ -451,13 +451,13 @@ else if (res == EGAIN)
   }
 ```
 
-When the semaphore is correctly posted, the value is increased and the oldest high priority thread waiting (if any) is added to the READY list, allowing it to acquire the semaphore.
+Quando um semáforo é corretamente informado, o valor é incrementado e o a _thread_ mais antiga de alta prioridade aguarda (se alguma) ser adicionada para a lista READY, permitindo adquirir o semáforo.
 
-If any of the waiting threads has a higher priority than the currently running thread, µOS++ will run the highest-priority thread made ready by `post()`. The current thread is suspended until it'll become the highest-priority thread that is ready to run.
+Se algum das _threads_ aguardando, tem uma prioridade mais alta que a _thread_ em execução no momento, µOS++ rodará a _thread_ de maior prioridade tornando-a pronta para `post()`. A _thread_ corrente é suspendida até ele se tornar a _thread_ de maior prioridade que está pronta para executar.
 
-### Posting to semaphores from ISRs
+### Informando (Posting) o semaforo de uma ISRs
 
-It is perfectly possible to post semaphores from ISRs, generally to synchronise waiting threads with events occurring on interrupts.
+É perfeitamente possível informar (post) um semáforo de uma ISR, geralmente para sincronizar _threads_ que aguardam  eventos ocorrerem em interrupções.
 
 ## Waiting on semaphores
 
