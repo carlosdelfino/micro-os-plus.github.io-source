@@ -25,22 +25,22 @@ Base Commit:
 
 ### Mutexes Normais
 
-### Recursive mutexes
+### Mutexes Recursivos
 
-## Creating mutexes
+## Criando mutexes
 
-## Acquiring a mutex
+## Adquirindo um mutex
 
-## Releasing a mutex
+## Liberando um mutex
 
-## Multiple threads waiting on a mutex
+## Multiplas threads aguardando um mutex
 
-## Other mutex functions
+## Outras funções para mutex
 
-## Destroying mutexes
+## Destruindo mutexes
 
-## Priority inversion
+## Inversão de prioridades
 
-## Priority inheritance
+## Herança de Prioridades
 
-## Deadlock (or deadly embrace)
+## Deadlock (ou abraço da morte)
