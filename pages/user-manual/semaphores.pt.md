@@ -14,16 +14,19 @@ last_updated_at:  2016-08-26 17:30:00 +0300
 
 start_translate_at:  2016-08-24 20:30:00 +0300
 
+Base Commit:
+ - aac11b8d05198ec0a390c2c046e9578e92726ad0
+ - 0ff10d71be7c5551398ddf85685efb53fa6a37e7
+
 {% endcomment %}
 
 ## Visão Geral
 
 Semáforos são um dos mais antigos mecanismos introduzidos pelos sistemas multi tarefas, sendo usado tanto para gerenciar recursos comuns como sincronização.
 
-Gerenciando recursos comuns, no seu formato mais simples, evita varias _threads_ concorrer pelo uso de um recurso compartilhado pelo bloqueio do acesso de todas as outras _threads_ até a _thread_ que adquiriu o recuso o libere.
+Gerenciando recursos comuns, no seu formato mais simples, evita que varias _threads_ concorram pelo uso de um recurso compartilhado, bloqueando o acesso de todas as outras _threads_ até a _thread_ que adquiriu o recuso o libere.
 
-Sincronização é geralmente requerida para eficientemente implementar bloqueio de I/O; quando uma _thread_ requer algum dado que não está ainda disponível (por exemplo para executar um `read()`), ele não é eficiente para efetuar sondar até que os dados se tornem disponíveis, mas é muito melhor que suspender a _thread_ e preparar para que o produtor de dados (normalmente um ISR) retome a _thread_  quando o dado está disponível.
-
+A Sincronização é geralmente requerida para implementar de forma eficientemente o bloqueio de I/O; quando uma _thread_ requer algum dado que não está ainda disponível (por exemplo para executar um `read()`), não é eficiente ficar sondando até que os dados se tornem disponíveis, mas é muito melhor suspender a _thread_ e preparar para que o produtor de dados (normalmente um ISR) retome a _thread_  quando o dado está disponível.
 
 No µOS++ há dois mecanismos básicos de sincronização: **semáforos** e **_flags_ de eventos**.
 
@@ -47,25 +50,25 @@ Atenção: no µOS++, mesmo que semáforos binários ou de contagens sejam defin
 
 ### Semáforos binários 
 
-Já que nós mencionamos a analogia com um sistema ferroviário, permita imaginarmos ter uma pequena estação de trem, com uma simples plataforma. O primeiro trem a chegar na estação sem alguma restrição, e parar na plataforma. Para evitar um segundo trem de entrar na estação e bater no primeiro, um semáforo é instalado a certa distância antes da estação. O semáforo da ferrovia tem uma mão vermelha que pode ou estar elevado ou baixado. Semáforos modernos são elétricos, e também tem luzes (vermelho e verde). Aós o primeiro trem entrar na estação, a mão é baixada e a luz se torna vermelha. Se um segundo trem chega, ele lé isto como "parar" e esperar. Quando o primeiro trem deixa a estação, o semáforo se alterna a luz se torna verde e o segundo trem pode entrar na estação.
+Já que nós mencionamos a analogia com um sistema ferroviário, permita imaginarmos ter uma pequena estação de trem, com uma simples plataforma. O primeiro trem a chegar na estação sem alguma restrição e parar na plataforma. Para evitar um segundo trem de entrar na estação e bater no primeiro, um semáforo é instalado a certa distância antes da estação. O semáforo da ferrovia tem uma mão vermelha que pode, ou estar elevado ou baixado. Semáforos modernos são elétricos, e também tem luzes (vermelho e verde). Ao primeiro trem entrar na estação, a mão é baixada e a luz se torna vermelha. Se um segundo trem chega, ele lé isto como "parar" e esperar. Quando o primeiro trem deixa a estação, o semáforo se alterna a luz se torna verde e o segundo trem pode entrar na estação.
 
 Como um semáforo de ferrovia que tem dois estados, um semáforo binário tem somente dois valores, 0 ou 1. Se o valor é 0, o recurso associado com o semáforo não está disponível, e qualquer um que precisar dele, tem que esperar, como trem que parou no semáforo vermelho. quando o recurso se torna disponível, o semáforo é "informado" (posted), permitindo o segundo trem aguardando pelo semáforo para continuar.
 
 Dependendo do uso do semáforo, ele pode iniciar ou com 0 (quando usado para sincronização) ou com 1 (quando usado para proteger um simples recursos compartilhado).
 
-O que um semáforo binário tem a mais que um semáforo de ferrovia, é um método de sinalização (pense neste mecanismo como uma corneta alta usada para acordar o maquinas que dorme, aguardando o semáforo).
+O que um semáforo binário tem a mais que um semáforo de ferrovia, é um método de sinalização (pense neste mecanismo como uma corneta alta usada para acordar o maquinista que dorme, aguardando o semáforo).
 
 ### Semáforo de Contagem
 
-Para continuar a analogia com o sistema ferroviário, e se nos tempos uma grande estação de trem, com múltiplas plataformas, onde muitos trens podem estar presente ao mesmo tempo? Bem, a solução é similar, mas a lógica do semáforo manter o controle sobre o número de trens na estação, e acender a luz vermelha quando todas os trilhos estiverem ocupados. Quando um trem deixa a estação, o semáforo pode ser tornar verde e se há um trem aguardando, ele será permitido entrar na estação.
+Para continuar a analogia com o sistema ferroviário, e se nos temos uma grande estação de trem, com múltiplas plataformas, onde muitos trens podem estar presente ao mesmo tempo? Bem, a solução é similar, mas a lógica do semáforo é manter o controle sobre o número de trens na estação, e acender a luz vermelha quando todas os trilhos estiverem ocupados. Quando um trem deixa a estação, o semáforo pode se tornar verde e se há um trem aguardando, ele será permitido entrar na estação.
 
 Um semáforo de contagem tem um contador com um limite, representando o número máximo de recursos disponíveis.
 
 Dependendo do uso do semáforo, ele usualmente inicia ou com 0 (quando usado para sincronização) ou em seu limite (quando usado para proteger múltiplos recursos compartilhados).
 
-Assumindo que ele inicia em zero, com nenhum recurso disponível, o semáforo é "informado" (posted) cada vez um novo recurso se torna disponível, que incrementa o o contador. Quando o máximo é atingido, "informes" (posts) futuras falharão e o contador se mantem inalterado.
+Assumindo que ele inicia em zero, com nenhum recurso disponível, o semáforo é "informado" (posted) cada vez um novo recurso se torna disponível, que incrementa o contador. Quando o máximo é atingido, "informes" (posts) futuras falharão e o contador se mantem inalterado.
 
-No outro lado, quando recursos precisam ser consumidos, e quanto o contador é positivos, a _thread_ requerente será permitida acessar o recurso e cada requisição, o contador será decrementado.
+No outro lado, quando recursos precisam ser consumidos, e quanto o contador é positivo, a _thread_ requerente será permitida acessar o recurso e cada requisição, o contador será decrementado.
 
 Quando o contador atinge 0, nenhum recurso está mais disponível e a _thread_ requerente é suspendida, até o semáforo ser informado.
 
@@ -83,7 +86,7 @@ Por questões de convenção, µOS++ tem vários funções pra criação de sem�
 
 Quando usado para sincronizar _threads_ com ISRs, a forma mais simples para acessar semáforo é quando ele são criados como objetos globais.
 
-O valor inicial para o semáforo é tipicamente zero (0), indicando que o evento não tem ainda ocorrido, ou não há recursos. É possível inicializar o semáforo com um valor diferente de zero, indicando que o semáforo inicialmente contem o número de recursos.
+O valor inicial para o semáforo é tipicamente zero (0), indicando que o evento não tenha ainda ocorrido, ou não há recursos. É possível inicializar o semáforo com um valor diferente de zero, indicando que o semáforo inicialmente contém o número de recursos.
 
 Em C++, os semáforos globais são criados e inicializados pelo mecanismo de construtor estático global.
 
@@ -173,7 +176,7 @@ os_main (int argc, char* argv[])
 }
 ```
 
-Em C++, se ele é necessário controlar o momento quando as instancias de objetos globais são criados, é possível separadamente alocar o armazenamento de variáveis globais, então usa a declaração com o operador `new` para então inicializa-lo.
+Em C++, se ele é necessário controlar o momento quando as instâncias de objetos globais são criados, é possível separadamente alocar o armazenamento de variáveis globais, então usa a declaração com o operador `new` para então inicializa-lo.
 
 ``` c++
 /// @file app-main.cpp
@@ -451,9 +454,9 @@ else if (res == EGAIN)
   }
 ```
 
-Quando um semáforo é corretamente informado, o valor é incrementado e o a _thread_ mais antiga de alta prioridade aguarda (se alguma) ser adicionada para a lista READY, permitindo adquirir o semáforo.
+Quando um semáforo é corretamente informado, o valor é incrementado e a _thread_ mais antiga de alta prioridade aguarda (se alguma) ser adicionada para a lista READY, permitindo adquirir o semáforo.
 
-Se algum das _threads_ aguardando, tem uma prioridade mais alta que a _thread_ em execução no momento, µOS++ rodará a _thread_ de maior prioridade tornando-a pronta para `post()`. A _thread_ corrente é suspendida até ele se tornar a _thread_ de maior prioridade que está pronta para executar.
+Se alguma das _threads_ aguardando, tem uma prioridade mais alta que a _thread_ em execução no momento, µOS++ rodará a _thread_ de maior prioridade tornando-a pronta para `post()`. A _thread_ corrente é suspendida até ele se tornar a _thread_ de maior prioridade que está pronta para executar.
 
 ### Informando (Posting) o semaforo de uma ISRs
 
