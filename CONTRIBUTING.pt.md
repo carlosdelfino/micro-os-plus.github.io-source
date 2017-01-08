@@ -38,7 +38,7 @@ Atenção: o texto deve respeitar a sintaxe do markdown; faça um preview da men
 git remote add upstream git@github.com:micro-os-plus/micro-os-plus.github.io.git
 ```
 
-**2.** Antes de iniciar o processo de contribuição, crie uma nova branch para fazer suas alterações.
+**2.** Antes de iniciar o processo de contribuição, crie uma novo _branch_ para fazer suas alterações.
 
 Alguns exemplos:
 
@@ -110,5 +110,62 @@ Quando estiver em uma situação em que você não sabe exatamente como traduzir
 **4.** Como mantemos um arquivo de [glossário](https://github.com/micro-os-plus/micro-os-plus.github.io/blob/master/glossario.pt.md), faça um _Pull Request_ adicionando o novo termo, colocando a referência `#<número-da-issue>` no termo/palavra em questão para fácil acesso no futuro.
 
 ***
+
+### Como está sendo o processo de tradução no português.
+
+O processo de tradução no português está usando uma estratégia bem simples, foi criado um fork do repositório original, para cada arquivo traduzido é criado um _branch_ com o nome do arquivo original, caso haja conflitos de nomes, é adicionado o prefixo ao nome com o diretório onde ele se encontra mais o traço baixo "\_".
+
+Em seguida é criado um novo arquivo neste novo branch adicionando "_pt" ao nome, como exemplo  para a tradução do arquivo "semaphore.md" é criado o arquivo "semaphore_pt.md", veja que o nome do arquivo é mantido em inglês, isso é importante para manter os arquivos traduzidos fácilmente identificaveis para possíveis comparações de conteúdo e formatação.
+
+Veja que o conteúdo do arquivo é traduzido seguindo as sugestões apresentadas nas seções anteriores, portanto termos técnicos, estrangeirismos precisam de cuidados especiais.
+
+Cada arquivo recebe as seguintes diretivas em seu cabeçalho YML:
+
+```
+---
+layout: page
+lang: pt
+permalink: /pt/user-manual/semaphores/
+title: Semáforos
+author: Liviu Ionescu
+translator: Carlos Delfino
+
+date: 2016-07-12 10:36:00 +0300
+last_updated_at:  2016-08-26 17:30:00 +0300
+
+---
+{% comment %}
+
+start_translate_at:  2016-08-24 20:30:00 +0300
+
+Base Commit:
+ - aac11b8d05198ec0a390c2c046e9578e92726ad0
+ - 0ff10d71be7c5551398ddf85685efb53fa6a37e7
+
+{% endcomment %}
+```
+
+Observe o seguinte a diretiva `lang` deve indicar o idioma usado, e a diretiva "permalink" deve ser prefixada com o mesmo idioma, ou seja para o português, para cada `permalink` original deve haver um permalink prefixado com o idioma `/pt`.
+
+Deve ser adicionado a diretiva `translator` ou `translators`caso haja mais de um tradutor, no caso de `translators` deve ser usado a notação para lista do _YAML_.
+
+A Diretiva `date` deve manter a data original da criação do arquivo no idioma inglês, porém deve ser adicioando uma diretiva `last_updated_at` que irá conter a ultima alteração do arquivo ou a última tradução realizada..
+
+Logo aós o cabeçalho _YAML_ deve haver um bloco de comentário _Markdown_ com as seguintes diretivas:
+
+`start_translate_at`, que aponta da data de início da tradução.
+
+`Base Commit` que conterá a lista dos _HASH_ que fazem referencia aos commits que foram usado como base para a tradução.
+
+`todo`, lista de pendências relativas a tradução.
+
+Veja que a lista de referência aos commits é muito importante, para que se possa resgatar alguma tradução desatualizada e assim justificar alguma falta de sincronia entre os textos.
+
+Conforme o branch `master` for atualizado, este deve ser também mixado com um branch de nome `master_portuguese` e apenas deste último branch é que os branchs de cada arquivo traduzido deve ser feito.
+
+Ao termino da tradução de um arquivo o respetivo branch deve ser mixado (`merged`) com o branch `master_portuguese`, somente o gestor do site poderá fazer o mix (`merge`) do branch `master_portuguese` com o branch principal (`master`).
+
+Para terceiros que desejem contribuir com seus idiomas ou mesmo com correções em algum idioma já traduzido, este deverá entrar em contato com o gestor do site ou com o gestor de um dos Forks, que deverá ser solicitado através da abertura de um ISSUE.
+
 
 Obrigado!
